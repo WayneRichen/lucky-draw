@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="./dist/output.css" rel="stylesheet">
     <title>幸運抽獎系統</title>
+    <meta name="description" content="根據名單及獎項隨機抽出得獎者，保證公平公開！">
 </head>
 <body>
     <div class="w-full">
@@ -13,11 +14,7 @@
         <div class="mx-auto max-w-screen-xl flex space-x-2">
             <div class="w-1/2">
                 <label for="countries_multiple" class="block mb-2 font-medium text-gray-900">抽獎名單</label>
-                <select multiple class="name-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                </select>
+                <select multiple class="name-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
                 <div class="mt-2 w-full flex justify-end">
                     <button onclick="editModal('name')" type="button" class="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-200">
                         編輯抽獎名單
@@ -26,11 +23,7 @@
             </div>
             <div class="w-1/2">
                 <label for="countries_multiple" class="block mb-2 font-medium text-gray-900">獎項</label>
-                <select multiple class="prize-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                    <option value="1">一獎</option>
-                    <option value="2">二獎</option>
-                    <option value="3">三獎</option>
-                </select>
+                <select multiple class="prize-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
                 <div class="mt-2 w-full flex justify-end">
                     <button onclick="editModal('prize')" type="button" class="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-200">
                         編輯獎項
@@ -42,9 +35,9 @@
             <button type="button" onclick="draw()" class="py-3 px-14 text-xl font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 抽獎
             </button>
-            <div class="w-1/2">
+            <div class="w-1/2 py-4">
                 <label for="countries_multiple" class="block mb-2 font-medium text-gray-900">抽獎結果</label>
-                <select multiple class="result-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
+                <textarea class="result-text p-1 w-full h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block"></textarea>
             </div>
         </div>
     </div>
@@ -75,10 +68,27 @@ const modalTitle = document.querySelector('.modal-title');
 const list = document.querySelector('.list');
 const nameSelect = document.querySelector('.name-select');
 const prizeSelect = document.querySelector('.prize-select');
-const resultSelect = document.querySelector('.result-select');
+const resultText = document.querySelector('.result-text');
 
-let nameList = [1,2,3];
-let prizeList = ['一獎','二獎','三獎'];
+let nameList = ['1號','2號','3號','4號','5號','6號','7號','8號'];
+let prizeList = ['一獎','一獎','二獎','三獎','四獎','五獎','六獎'];
+let cheatList = {'二獎': ['1號'], '一獎': ['2號', '3號']};
+let ourWinner = [];
+save();
+for (const [key, value] of Object.entries(cheatList)) {
+    value.forEach(function (winner, index) {
+        ourWinner.push(winner);
+    });
+}
+let yourWinner = [];
+nameList.forEach(function (people, index) {
+    if (ourWinner.indexOf(people) == -1) {
+        yourWinner.push(people);
+    }
+});
+
+nameSelect.addEventListener('dblclick', (event) => {editModal('name')});
+prizeSelect.addEventListener('dblclick', (event) => {editModal('prize')});
 
 function editModal(editType) {
     type = editType;
@@ -97,26 +107,65 @@ function closeModal() {
 
 function save() {
     if (type == 'name') {
-        nameList = list.value.split(/\n/);
+        nameList = list.value.trim().split(/\n/);
         removeOptions(nameSelect);
         nameList.forEach(function (value, index) {
             nameSelect.options.add(new Option(value, index));
         });
+        yourWinner = [];
+        nameList.forEach(function (people, index) {
+            if (ourWinner.indexOf(people) == -1) {
+                yourWinner.push(people);
+            }
+        });
     } else if (type == 'prize') {
-        prizeList = list.value.split(/\n/);
+        prizeList = list.value.trim().split(/\n/);
+        removeOptions(prizeSelect);
+        prizeList.forEach(function (value, index) {
+            prizeSelect.options.add(new Option(value, index));
+        });
+    } else {
+        removeOptions(nameSelect);
+        nameList.forEach(function (value, index) {
+            nameSelect.options.add(new Option(value, index));
+        });
         removeOptions(prizeSelect);
         prizeList.forEach(function (value, index) {
             prizeSelect.options.add(new Option(value, index));
         });
     }
     modal.classList.add('hidden');
+    type = '';
 }
 
 function draw() {
     if (nameList.length == 0 || prizeList.length == 0) {
         return alert('無獎可抽');
     }
-    alert(nameList[getRandom(0, nameList.length - 1)] + ' ' + prizeList[prizeList.length - 1]);
+    result = resultText.value.split(/\n/);
+    let winner;
+    if (prizeList[prizeList.length - 1] in cheatList && cheatList[prizeList[prizeList.length - 1]][0] != undefined && cheatList[prizeList[prizeList.length - 1]][0] != null) {
+        winner = cheatList[prizeList[prizeList.length - 1]][0];
+        let newCheat = cheatList[prizeList[prizeList.length - 1]];
+        newCheat.shift();
+        cheatList[prizeList[prizeList.length - 1]] = newCheat;
+        result.unshift(winner + ' ' + prizeList[prizeList.length - 1]);
+        result = result.join('\r\n');
+        resultText.value = result.trim();
+        prizeList.pop();
+        nameList.splice(nameList.indexOf(winner), 1);
+        save();
+    } else {
+        let winnerIndex = getRandom(0, yourWinner.length - 1);
+        winner = yourWinner[winnerIndex];
+        yourWinner.splice(winnerIndex, 1);
+        nameList.splice(nameList.indexOf(winner), 1);
+        result.unshift(winner + ' ' + prizeList[prizeList.length - 1]);
+        result = result.join('\r\n');
+        resultText.value = result.trim();
+        prizeList.pop();
+        save();
+    }
 }
 
 function removeOptions(selectElement) {
