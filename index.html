@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./dist/output.css" rel="stylesheet">
+    <title>幸運抽獎系統</title>
+</head>
+<body>
+    <div class="w-full">
+        <h1 class="text-center text-4xl my-2">幸運抽獎系統</h1>
+        <div class="mx-auto max-w-screen-xl flex space-x-2">
+            <div class="w-1/2">
+                <label for="countries_multiple" class="block mb-2 font-medium text-gray-900">抽獎名單</label>
+                <select multiple class="name-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+                <div class="mt-2 w-full flex justify-end">
+                    <button onclick="editModal('name')" type="button" class="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-200">
+                        編輯抽獎名單
+                    </button>
+                </div>
+            </div>
+            <div class="w-1/2">
+                <label for="countries_multiple" class="block mb-2 font-medium text-gray-900">獎項</label>
+                <select multiple class="prize-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <option value="1">一獎</option>
+                    <option value="2">二獎</option>
+                    <option value="3">三獎</option>
+                </select>
+                <div class="mt-2 w-full flex justify-end">
+                    <button onclick="editModal('prize')" type="button" class="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-200">
+                        編輯獎項
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="mx-auto mt-4 max-w-screen-xl flex flex-col items-center justify-center">
+            <button type="button" onclick="draw()" class="py-3 px-14 text-xl font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                抽獎
+            </button>
+            <div class="w-1/2">
+                <label for="countries_multiple" class="block mb-2 font-medium text-gray-900">抽獎結果</label>
+                <select multiple class="result-select h-64 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
+            </div>
+        </div>
+    </div>
+    <div class="modal-main hidden fixed z-0 w-full h-full top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/[.5]">
+        <div class="w-1/2 mx-auto bg-white rounded-lg shadow">
+            <div class="flex justify-between items-start p-4 rounded-t border-b">
+                <h3 class="modal-title text-xl font-semibold text-gray-900"></h3>
+                <button type="button" onclick="closeModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="defaultModal">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <div class="p-1">
+                <textarea class="list w-full h-64 p-1 bg-gray-50"></textarea>
+            </div>
+            <div class="flex justify-end items-center p-3 space-x-2 rounded-b border-t border-gray-200">
+                <button onclick="closeModal()" data-modal-toggle="defaultModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">取消</button>
+                <button onclick="save()" data-modal-toggle="defaultModal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">儲存</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+let type = '';
+const modal = document.querySelector('.modal-main');
+const modalTitle = document.querySelector('.modal-title');
+const list = document.querySelector('.list');
+const nameSelect = document.querySelector('.name-select');
+const prizeSelect = document.querySelector('.prize-select');
+const resultSelect = document.querySelector('.result-select');
+
+let nameList = [1,2,3];
+let prizeList = ['一獎','二獎','三獎'];
+
+function editModal(editType) {
+    type = editType;
+    modalTitle.innerText = type == 'name' ? '編輯名單' : '編輯獎項';
+    modal.classList.toggle('hidden');
+    if (type == 'name') {   
+        list.value = nameList.join('\r\n');
+    } else if (type == 'prize') {
+        list.value = prizeList.join('\r\n');
+    }
+}
+
+function closeModal() {
+    modal.classList.add('hidden');
+}
+
+function save() {
+    if (type == 'name') {
+        nameList = list.value.split(/\n/);
+        removeOptions(nameSelect);
+        nameList.forEach(function (value, index) {
+            nameSelect.options.add(new Option(value, index));
+        });
+    } else if (type == 'prize') {
+        prizeList = list.value.split(/\n/);
+        removeOptions(prizeSelect);
+        prizeList.forEach(function (value, index) {
+            prizeSelect.options.add(new Option(value, index));
+        });
+    }
+    modal.classList.add('hidden');
+}
+
+function draw() {
+    if (nameList.length == 0 || prizeList.length == 0) {
+        return alert('無獎可抽');
+    }
+    alert(nameList[getRandom(0, nameList.length - 1)] + ' ' + prizeList[prizeList.length - 1]);
+}
+
+function removeOptions(selectElement) {
+   let i, L = selectElement.options.length - 1;
+   for (i = L; i >= 0; i--) {
+      selectElement.remove(i);
+   }
+}
+
+function getRandom(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+};
+</script>
