@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../dist/output.css" rel="stylesheet">
+    <script src="../dist/jquery-3.6.1.min.js"></script>
+    <title>設定 - 幸運抽獎系統</title>
+    <meta name="description" content="根據名單及獎項隨機抽出得獎者，保證公平公開！">
+</head>
+<body>
+    <h1 class="text-center text-4xl my-2">後台設定</h1>
+    <div class="mx-2 md:mx-auto max-w-screen-xl space-x-2 ">
+        <div class="fields w-full"></div>
+        <div class="w-full flex justify-center mb-28">
+            <button type="button" class="add py-2.5 px-5 mr-2 mb-2 font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-200">新增</button>
+        </div>
+    </div>
+    <div class="fixed z-1 bottom-0 w-full h-24 border-2 border-gray-100 bg-slate-50">
+        <div class="h-full mx-auto max-w-screen-xl space-x-4 flex justify-end items-center">
+            <a href="/" class="py-3 px-5 mr-2 font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-200">回前台</a>
+            <button type="button" onclick="save()" class="saved-text text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg h-12 px-8 focus:outline-none">儲存</button>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+let cheatList = localStorage.getItem('cheatList');
+cheatList = JSON.parse(cheatList);
+for (const [key, value] of Object.entries(cheatList)) {
+    let winner = value;
+    winner.forEach(function (value, index) {
+        newRowAdd = 
+            '<div class="row relative grid gap-6 mb-6 md:grid-cols-2 w-11/12">' + 
+                '<div>' + 
+                    '<label for="prize" class="block mb-2 font-medium text-gray-900">獎項</label>' + 
+                    `<input type="text" name="prize" id="prize" value="${key}" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="">` + 
+                '</div>' + 
+                '<div>' + 
+                    '<label for="winner" class="block mb-2 font-medium text-gray-900">得獎者</label>' + 
+                        `<input type="text" name="winner" id="winner" value="${value}" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="">` + 
+                '</div>' + 
+                '<button type="button" class="deleteRow absolute -right-16 top-8 h-10 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">X</button>' + 
+            '</div>';
+        $('.fields').append(newRowAdd);
+    });
+}
+$(".add").click(function () {
+    newRowAdd = 
+        '<div class="row relative grid gap-6 mb-6 md:grid-cols-2 w-11/12">' + 
+            '<div>' + 
+                '<label for="prize" class="block mb-2 font-medium text-gray-900">獎項</label>' + 
+                '<input type="text" name="prize" id="prize" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="">' + 
+            '</div>' + 
+            '<div>' + 
+                '<label for="winner" class="block mb-2 font-medium text-gray-900">得獎者</label>' + 
+                    '<input type="text" name="winner" id="winner" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="">' + 
+            '</div>' + 
+            '<button type="button" class="deleteRow absolute -right-16 top-8 h-10 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">X</button>' + 
+        '</div>';
+    $('.fields').append(newRowAdd);
+});
+
+$("body").on("click", ".deleteRow", function () {
+    $(this).parents(".row").remove();
+})
+
+function save() {
+    let prize = document.querySelectorAll('input[name=prize]');
+    let winner = document.querySelectorAll('input[name=winner]');
+
+    let data = {};
+    prize.forEach( function(prize, index) {
+        if (data[prize.value] != undefined) {
+            let people = data[prize.value];
+            people.push(winner[index].value);
+            data[prize.value] = people;
+        } else {
+            data[prize.value] = [winner[index].value];
+        }
+    });
+    localStorage.setItem('cheatList', JSON.stringify(data));
+    $('.saved-text').text('已儲存');
+    setTimeout(function() {
+        $('.saved-text').text('儲存');
+    }, 5000);
+}
+</script>

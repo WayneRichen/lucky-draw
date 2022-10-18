@@ -71,8 +71,9 @@ const prizeSelect = document.querySelector('.prize-select');
 const resultText = document.querySelector('.result-text');
 
 let nameList = ['1號','2號','3號','4號','5號','6號','7號','8號'];
-let prizeList = ['一獎','一獎','二獎','三獎','四獎','五獎','六獎'];
-let cheatList = {'二獎': ['1號'], '一獎': ['2號', '3號']};
+let prizeList = ['一獎','二獎','二獎','三獎','四獎','五獎','六獎'];
+let cheatList = localStorage.getItem('cheatList');
+cheatList = JSON.parse(cheatList);
 let ourWinner = [];
 save();
 for (const [key, value] of Object.entries(cheatList)) {
